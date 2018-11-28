@@ -124,6 +124,6 @@ docker run -itd --name web -p 80:80 -v /root/nginx/nginx.conf:/etc/nginx/nginx.c
 此时输入 `docker ps` 就可以看到这两个容器已经跑起来了
 
 docker化项目并在nginx部署就已经完成了
-在浏览器输入 http://a.yourdomain.cn 和 http://b.yourdomain.cn就可以看到效果了，分别对应本地电脑中的web 和 web1 项目
+在浏览器输入 http://a.yourdomain.cn 和 http://b.yourdomain.cn 就可以看到效果了，分别对应本地电脑中的web 和 web1 项目
 
 
