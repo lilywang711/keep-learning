@@ -6,10 +6,10 @@
 - 3、需要对 docker 已有所熟悉 ，并了解Dockerfile里的一些指令
 ## 使用Dockerfile 制作镜像
 
-假如本机有一个叫web的项目
+假如本机有一个叫web的项目
 
 
-在web根目录下新建Dockerfile，写入以下内容
+在web根目录下新建Dockerfile，写入以下内容
 
 ```
 FROM nginx:1.13.6-alpine
@@ -121,7 +121,7 @@ docker run -itd --name web -p 80:80 -v /root/nginx/nginx.conf:/etc/nginx/nginx.c
 
 `docker run -itd --name web1 -p 81:80 -v /root/nginx/nginx.conf:/etc/nginx/nginx.conf lilywang711/web1`
 
-此时输入 `docker ps` 就可以看到这两个容器已经跑起来了
+此时输入 `docker ps` 就可以看到这两个容器已经跑起来了
 
 docker化项目并在nginx部署就已经完成了
 在浏览器输入 http://a.yourdomain.cn 和 http://b.yourdomain.cn就可以看到效果了，分别对应本地电脑中的web 和 web1 项目
