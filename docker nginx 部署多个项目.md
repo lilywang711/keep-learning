@@ -98,11 +98,11 @@ http {
     }
 }
 ```
-接下来
+接下来
 
 启动docker `systemctl start docker`
 
-拉取刚才制作并上传好的两个镜像 
+拉取刚才制作并上传好的两个镜像 
 
 `docker pull lilywang711/web` 
 
