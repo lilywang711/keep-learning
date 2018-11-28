@@ -1,8 +1,8 @@
-# docker nginx 部署多个项目
+# docker nginx 部署多个项目
 
-## 前提条件
+## 前提条件
 - 1、本地电脑和服务器已安装 docker，下载方法自行谷歌吧
-- 2、在 docker hub 上已有账号， 注册传送门: https://hub.docker.com/
+- 2、在 docker hub 上已有账号， 注册传送门: https://hub.docker.com/
 - 3、需要对 docker 已有所熟悉 ，并了解Dockerfile里的一些指令
 ## 使用Dockerfile 制作镜像
 
@@ -10,7 +10,7 @@
 
 
 在web根目录下新建Dockerfile，写入以下内容
-
+
 ```
 FROM nginx:1.13.6-alpine
 LABEL maintainer="lilywang <lilywang.cd@gmail.com>"
@@ -41,7 +41,7 @@ CMD ["nginx", "-g", "daemon off;"]
 |____dist // 为项目打包后的文件
 | |____index.html
 ```
-接下来在bash 进入到web目录
+接下来在 bash 进入到web目录
 
 `cd web`
 
@@ -61,7 +61,7 @@ Successfully tagged lilywang711/web:latest
 ## 服务端部署
 
 ssh 登陆服务器，在当前用户目录下，新建 nginx 文件夹，并在里面新建nginx.conf
-在 nginx.conf 中写入以下内容
+在 nginx.conf 中写入以下内容
 
 ```
 user nginx;
@@ -98,11 +98,11 @@ http {
     }
 }
 ```
-接下来
+接下来
 
 启动docker `systemctl start docker`
 
-拉取刚才制作并上传好的两个镜像 
+拉取刚才制作并上传好的两个镜像 
 
 `docker pull lilywang711/web` 
 
@@ -124,6 +124,6 @@ docker run -itd --name web -p 80:80 -v /root/nginx/nginx.conf:/etc/nginx/nginx.c
 此时输入 `docker ps` 就可以看到这两个容器已经跑起来了
 
 docker化项目并在nginx部署就已经完成了
-在浏览器输入 http://a.yourdomain.cn 和 http://b.yourdomain.cn就可以看到效果了，分别对应本地电脑中的web 和 web1 项目
+在浏览器输入 http://a.yourdomain.cn 和 http://b.yourdomain.cn就可以看到效果了，分别对应本地电脑中的web 和 web1 项目
 
 
