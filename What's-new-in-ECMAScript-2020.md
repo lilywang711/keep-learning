@@ -14,7 +14,7 @@ ES6 的含义是 5.1 版以后的 JavaScript 的下一代标准，涵盖了 ES20
 - Stage 3 - Candidate（候选人阶段）
 - Stage 4 - Finished（定案阶段）
 
-可在 TC39（标准制定委员会）的 [github](https://github.com/tc39/ecma262) 上看到所有提案以及状态
+可在 TC39（标准制定委员会）的 [Github](https://github.com/tc39/ecma262) 上查阅所有提案以及提案的状态
 
 ## 正题
 
@@ -28,9 +28,28 @@ ES6 的含义是 5.1 版以后的 JavaScript 的下一代标准，涵盖了 ES20
 const matchIterator = str.matchAll(regExp);
 ```
 
-`String#matchAll` 返回的是一个 Iterator(迭代器)，选择 Iterator 的原因是如果正则中包含大量的捕获组或者是超长文本，总是将数据庞大的匹配结果生成数组会产生性能影响
+```js
+[...'-a-a-a'.matchAll(/-(a)/ug)] // output: [ [ '-a', 'a' ], [ '-a', 'a' ], [ '-a', 'a' ] ]
+
+// 封装成仅返回捕获组的函数
+function collectGroup1(regExp, str) {
+  let arr = [...str.matchAll(regExp)];
+  return arr.map(x => x[1]);
+}
+
+// 更精简
+function collectGroup1(regExp, str) {
+  return Array.from(str.matchAll(regExp), x => x[1]);
+}
+```
+
+String#matchAll` 返回的是一个 Iterator(迭代器)，选择 Iterator 的原因是如果正则中包含大量的捕获组或者是超长文本，总是将数据庞大的匹配结果生成数组会产生性能影响
+
+注意：传递给 matchAll 的 regExp 必须含有`/g` 标识符，这个决定在此 [Issue](https://github.com/tc39/proposal-string-replaceall/issues/16) 中有大量讨论。
 
 #### 为什么会有 matchAll
+
+试想以下场景：
 
 如果有一个字符串和一个带有 sticky 或者 global 的正则表达式，其中有多个捕获组(capturing groups)，如果我想迭代所有的匹配，目前，我的方案有以下几种
 
@@ -90,16 +109,12 @@ matches; /* gives exactly what i want, but abuses `replace`,
 #### 进一步阅读
 
 1. [Proposal and Specs](https://github.com/tc39/proposal-string-matchall)
-2. [how String#matchAll works](https://2ality.com/2018/02/string-prototype-matchall.html)
-
-#### 额外阅读
-
-1. [讨论 String#replaceAll 与 String#matchAll 是否在未加 /g 时抛出异常](https://github.com/tc39/proposal-string-replaceall/issues/16)
+2. [How String#matchAll works](https://2ality.com/2018/02/string-prototype-matchall.html)
 
 ### import()
 #### 进一步阅读
 
-1. [how import() works](https://exploringjs.com/impatient-js/ch_modules.html#loading-modules-dynamically-via-import)
+1. [How import() works](https://exploringjs.com/impatient-js/ch_modules.html#loading-modules-dynamically-via-import)
 
 ### import.meta
 
@@ -125,7 +140,7 @@ matches; /* gives exactly what i want, but abuses `replace`,
 
 #### 进一步阅读
 
-1. [babel plugin 进一步解释](https://babeljs.io/docs/en/babel-plugin-proposal-nullish-coalescing-operator)
+1. [Babel plugin 进一步解释](https://babeljs.io/docs/en/babel-plugin-proposal-nullish-coalescing-operator)
 2. [Nullish coalescing Operator ](https://2ality.com/2019/08/nullish-coalescing.html)
 
 ### export * as ns from "mod"
