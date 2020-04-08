@@ -255,6 +255,12 @@ Promise.allSettled 接受一个 [promise1, promise2, ... ]，只有当数组里�
 
 ### globalThis 
 
+以下解释摘自 [MDN](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/globalThis)
+
+在以前，从不同的 JavaScript 环境中获取全局对象需要不同的语句。在 Web 中，可以通过 `window`、`self` 或者 `frames` 取到全局对象，但是在 Web Workers 中，只有 `self` 可以。在 Node.js 中，它们都无法获取，必须使用 `global`。
+
+`globalThis` 提供了一个标准的方式来获取不同环境下的全局 `this` 对象（也就是全局对象自身）。不像 `window` 或者 `self` 这些属性，它确保可以在有/无窗口的各种环境下正常工作。所以，你可以安心的使用 `globalThis`，不必担心它的运行环境。为便于记忆，你只需要记住，全局作用域中的 `this` 就是 `globalThis`。
+
 ### Optional chaining 
 
 先暂且翻译为”可选链“
