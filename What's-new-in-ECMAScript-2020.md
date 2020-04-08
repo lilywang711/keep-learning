@@ -22,7 +22,7 @@ ES6 的含义是 5.1 版以后的 JavaScript 的下一代标准，涵盖了 ES20
 
 ### String.prototype.matchAll
 
-#### 使用方式
+#### 语法
 
 ```js
 const matchIterator = str.matchAll(regExp);
@@ -112,15 +112,141 @@ matches; /* gives exactly what i want, but abuses `replace`,
 2. [How String#matchAll works](https://2ality.com/2018/02/string-prototype-matchall.html)
 
 ### import()
+
+#### 语法
+
+有以下文件
+
+```js
+lib/my-math.mjs
+main1.mjs
+main2.mjs
+```
+
+其中`my-math.mjs`：
+
+```js
+// Not exported, private to module
+function times(a, b) {
+  return a * b;
+}
+export function square(x) {
+  return times(x, x);
+}
+export const LIGHTSPEED = 299792458;
+```
+
+在 `main1.mjs` 中这样使用 `import()`
+
+```js
+const dir = './lib/';
+const moduleSpecifier = dir + 'my-math.mjs';
+
+function loadConstant() {
+  return import(moduleSpecifier)
+  .then(myMath => {
+    const result = myMath.LIGHTSPEED;
+    assert.equal(result, 299792458);
+    return result;
+  });
+}
+```
+
+以下两点在这个特性未出之前是无法实现的：
+
+- 在函数内部 import 文件
+- 模块资源标识符来自于变量
+
+由于 `import()`"返回"的是一个 promise，那么我们可以用 async await 这种更简洁的方式来改写以上代码
+
+```js
+const dir = './lib/';
+const moduleSpecifier = dir + 'my-math.mjs';
+
+async function loadConstant() {
+  const myMath = await import(moduleSpecifier);
+  const result = myMath.LIGHTSPEED;
+  assert.equal(result, 299792458);
+  return result;
+}
+```
+
+甚至可以通过 Promise.all() Promise.race 等 api 来实现特定的加载需求
+
+注意：尽管它的工作原理很像一个函数，但 import() 是一个操作符(**operator**)
+
+#### 使用场景
+
+1. 按需加载，一些 function 不再需要在程序启动时就被加载，而是在逻辑需要时才去主动导入
+
+   ```js
+   button.addEventListener('click', event => {
+     import('./dialogBox.mjs')
+       .then(dialogBox => {
+         dialogBox.open();
+       })
+       .catch(error => {
+         /* Error handling */
+       })
+   });
+   ```
+
+2. 根据条件判断决定是否加载
+
+   ```js
+   if (isLegacyPlatform()) {
+     import('./my-polyfill.mjs')
+       .then(···);
+   }
+   ```
+
+3. 动态计算模块资源标识符，国际化获取不同的语言包
+
+   ```js
+   import(`messages_${getLocale()}.mjs`)
+     .then(···);
+   ```
+
 #### 进一步阅读
 
-1. [How import() works](https://exploringjs.com/impatient-js/ch_modules.html#loading-modules-dynamically-via-import)
+
+1. [Proposal and Specs](https://github.com/tc39/proposal-dynamic-import)
+2. [How import() works](https://exploringjs.com/impatient-js/ch_modules.html#loading-modules-dynamically-via-import)
 
 ### import.meta
 
-### BigInt – arbitrary precision integers
+`import.meta` 是一个给 JavaScript 模块暴露特定上下文的元数据属性的对象。它包含了这个模块的信息，比如说这个模块的 URL
+
+`import.meta` 对象由一个关键字 `"import"`, 一个点符号和一个 `meta` 属性名组成。通常情况下 `"import."` 是作为一个属性访问的上下文，但是在这里 `"import"` 不是一个真正的对象
+
+`import.meta` 对象是由 ECMAScript 实现的，它带有一个 [`null`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/null)的原型对象。这个对象可以扩展，并且它的属性都是可写，可配置和可枚举的。
+
+#### 进一步阅读
+
+[Proposal and Specs](https://github.com/tc39/proposal-import-meta)
+
+### BigInt – 新的基本数据类型
+
+ JavaScript 中第 8 种基本数据类型 [Boolean, Null, Undefined, Number, BigInt, String, Symbol]
+
+关于 `BigInt` 这里有一篇解释更详细的文章 [传送门](https://juejin.im/post/5d3f8402f265da039e129574)
 
 ### Promise.allSettled
+
+#### 语法
+
+```js
+const promises = [ fetch('index.html'), fetch('https://does-not-exist/') ];
+const results = await Promise.allSettled(promises);
+const successfulPromises = results.filter(p => p.status === 'fulfilled');
+```
+
+Promise.allSettled 接受一个 [promise1, promise2, ... ]，只有当数组里所有 promise 的状态为 resolved 或者 rejected 后，`Promise.allSettled(promises)` 的状态才会改变为 resolved
+
+#### 场景
+
+1. 批量修改表格的内容，表格每一行的修改都需单独向服务器发起异步操作，操作完后需要在行末展示此次操作结果为失败还是成功
+2. 在埋点时，需要上报第一条中批量处理的结果，以计算成功率/失败率
 
 #### 进一步阅读
 
@@ -131,6 +257,58 @@ matches; /* gives exactly what i want, but abuses `replace`,
 
 ### Optional chaining 
 
+先暂且翻译为”可选链“
+
+#### 语法
+
+```js
+obj?.prop       // optional static property access
+obj?.[expr]     // optional dynamic property access
+func?.(...args) // optional function or method call
+
+const street = user.address?.street
+iterator.return?.()
+```
+
+如果`?.`前面的值是 undefined 或者 null，那该表达式的结果为 undefined
+
+#### 例子
+
+```js
+a?.b                          // undefined if `a` is null/undefined, `a.b` otherwise.
+a == null ? undefined : a.b
+
+a?.[x]                        // undefined if `a` is null/undefined, `a[x]` otherwise.
+a == null ? undefined : a[x]
+
+a?.b()                        // undefined if `a` is null/undefined
+a == null ? undefined : a.b() // throws a TypeError if `a.b` is not a function
+                              // otherwise, evaluates to `a.b()`
+
+a?.()                        // undefined if `a` is null/undefined
+a == null ? undefined : a()  // throws a TypeError if `a` is neither null/undefined, nor a function
+                             // invokes the function `a` otherwise
+
+a?.[++x]         // `x` is incremented if and only if `a` is not null/undefined
+a == null ? undefined : a[++x]
+
+
+a?.b.c(++x).d  // if `a` is null/undefined, evaluates to undefined. Variable `x` is not incremented.
+               // otherwise, evaluates to `a.b.c(++x).d`.
+a == null ? undefined : a.b.c(++x).d
+
+a?.b[3].c?.(x).d
+a == null ? undefined : a.b[3].c == null ? undefined : a.b[3].c(x).d
+  // (as always, except that `a` and `a.b[3].c` are evaluated only once)
+
+(a?.b).c
+(a == null ? undefined : a.b).c // edge case, there is no practical reason to use parentheses in this position anyway
+```
+
+#### 注意
+
+为了使`foo?.3:0`向后兼容解析成`foo ? .3 : 0`，此提议要求`?.`后不能紧跟数字
+
 #### 进一步阅读
 
 1. [Proposal and Specs](https://github.com/tc39/proposal-optional-chaining)
@@ -138,14 +316,68 @@ matches; /* gives exactly what i want, but abuses `replace`,
 
 ### Nullish coalescing Operator 
 
+本文先暂且将它翻译为”双问号操作符“
+
+双问号操作符的目的是在给变量提供默认值时替代以前的 `||`操作符，例如
+
+```js
+function (userInfo) {
+  return userInfo.name || 'david'
+}
+```
+
+既当 `||` 左边的值为 falsy 时，返回右边的默认值，对于值为 `undefined` 或 `null` 这样 falsy 值是没问题的，但在某些场景下， `0` 、`''` 、 `false` 是程序所期望的 falsy 值，不应该拿到默认值，所以就有了 nullish coalescing 的提案，解决有意义的 falsy 值被忽略的问题
+
+#### 语法
+
+```js
+falsyValue ?? 'default value'
+```
+
+#### 例子
+
+```js
+const response = {
+  settings: {
+    nullValue: null,
+    height: 400,
+    animationDuration: 0,
+    headerText: '',
+    showSplashScreen: false
+  }
+};
+
+const undefinedValue = response.settings.undefinedValue ?? 'some other default'; // result: 'some other default'
+const nullValue = response.settings.nullValue ?? 'some other default'; // result: 'some other default'
+const headerText = response.settings.headerText ?? 'Hello, world!'; // result: ''
+const animationDuration = response.settings.animationDuration ?? 300; // result: 0
+const showSplashScreen = response.settings.showSplashScreen ?? true; // result: false
+```
+
+
+
 #### 进一步阅读
 
-1. [Babel plugin 进一步解释](https://babeljs.io/docs/en/babel-plugin-proposal-nullish-coalescing-operator)
-2. [Nullish coalescing Operator ](https://2ality.com/2019/08/nullish-coalescing.html)
+1. [Proposal and Specs](https://github.com/tc39/proposal-nullish-coalescing)
+2. [Babel plugin 进一步解释](https://babeljs.io/docs/en/babel-plugin-proposal-nullish-coalescing-operator)
+3. [Nullish coalescing Operator ](https://2ality.com/2019/08/nullish-coalescing.html)
 
 ### export * as ns from "mod"
 
+有这个提议后，以下代码将会被改写
 
+```js
+import * as errors from "./errors";
+export {errors};
+```
+
+改写为：
+
+```js
+export * as errors from "./errors";
+```
+
+这里有一个真实场景的代码也就能被简化 [a real world example](https://github.com/open-flash/swf-tree/blob/894f609d1191db5222a68b37ccba8ba57077c58a/swf-tree.ts/src/lib/index.ts#L1-L9) 
 
 ## 参考
 
