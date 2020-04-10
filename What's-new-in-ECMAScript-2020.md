@@ -335,6 +335,7 @@ a == null ? undefined : a.b[3].c == null ? undefined : a.b[3].c(x).d
 
 1. [Proposal and Specs](https://github.com/tc39/proposal-optional-chaining)
 2.  [Optional chaining](https://2ality.com/2019/07/optional-chaining.html)
+3. [@babel/plugin-proposal-optional-chaining](https://babeljs.io/docs/en/babel-plugin-proposal-optional-chaining)
 
 ### Nullish coalescing Operator ：??
 
@@ -386,6 +387,7 @@ const showSplashScreen = response.settings.showSplashScreen ?? true; // result: 
 1. [Proposal and Specs](https://github.com/tc39/proposal-nullish-coalescing)
 2. [Babel plugin 进一步解释](https://babeljs.io/docs/en/babel-plugin-proposal-nullish-coalescing-operator)
 3. [Nullish coalescing Operator ](https://2ality.com/2019/08/nullish-coalescing.html)
+4. [@babel/plugin-proposal-nullish-coalescing-operator](https://babeljs.io/docs/en/babel-plugin-proposal-nullish-coalescing-operator)
 
 ### export * as ns from "mod"
 
@@ -403,6 +405,10 @@ export * as errors from "./errors";
 ```
 
 这里有一个真实场景的代码也使用这个提案后就能被简化 [a real world example](https://github.com/open-flash/swf-tree/blob/894f609d1191db5222a68b37ccba8ba57077c58a/swf-tree.ts/src/lib/index.ts#L1-L9) 
+
+#### 进一步阅读
+
+1. [@babel/plugin-proposal-export-namespace-from](https://babeljs.io/docs/en/babel-plugin-proposal-export-namespace-from)
 
 ## 参考
 
